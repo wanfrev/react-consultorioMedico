@@ -6,6 +6,7 @@ class Db {
       database: "consultorio",
       user: "postgres",
       password: "30200228",
+      host: "localhost", // Asegúrate de que el host esté configurado correctamente
       port: 5432,
       ssl: false,
       max: 20,
