@@ -26,8 +26,8 @@ const Login = () => {
           setError('Datos inválidos, no se puede hacer login..!');
         }
       } else {
-        const errorMessage = await response.text();
-        setError(errorMessage);
+        const errorData = await response.json();
+        setError(errorData.error);
       }
     } catch (error) {
       setError('Error al conectar con el servidor');
