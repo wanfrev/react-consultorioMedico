@@ -1,12 +1,12 @@
-const { Pool } = require("pg");
+const { Pool } = require('pg');
 
 class Db {
   constructor() {
     this.pool = new Pool({
-      database: "consultorio",
-      user: "postgres",
-      password: "30200228",
-      host: "localhost", // Asegúrate de que el host esté configurado correctamente
+      database: 'consultorio',
+      user: 'postgres',
+      password: '30200228',
+      host: 'localhost',
       port: 5432,
       ssl: false,
       max: 20,
@@ -20,10 +20,9 @@ class Db {
     let client;
     try {
       client = await this.pool.connect();
-      const result = await client.query(query, params);
-      return result;
+      return await client.query(query, params);
     } catch (error) {
-      console.error("Database error:", error.message);
+      console.error('Database error:', error.message);
       return null;
     } finally {
       if (client) client.release();

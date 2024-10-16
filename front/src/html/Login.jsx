@@ -9,6 +9,8 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Clear previous error
+
     try {
       const response = await fetch('/api/login', { // Usar la ruta /api
         method: 'POST',
@@ -18,16 +20,14 @@ const Login = () => {
         body: JSON.stringify({ username, password }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         if (data.success) {
           navigate('/inicio'); // Redirigir a la página de inicio
-        } else {
-          setError('Datos inválidos, no se puede hacer login..!');
         }
       } else {
-        const errorData = await response.json();
-        setError(errorData.error);
+        setError(data.error || 'Error desconocido');
       }
     } catch (error) {
       setError('Error al conectar con el servidor');

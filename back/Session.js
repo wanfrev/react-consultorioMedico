@@ -10,11 +10,11 @@ class Session {
           pool: this.db.pool,
           tableName: 'session',
         }),
-        secret: "qwertypoiuy123_flex",
+        secret: 'qwertypoiuy123_flex',
         resave: false,
         saveUninitialized: true,
         cookie: {
-          maxAge: 1800000, // 30 minutos
+          maxAge: 1800000,
           secure: false,
           sameSite: true,
         },
@@ -39,13 +39,13 @@ class Session {
         req.session.userId = result.rows[0].user_id;
         req.session.userName = result.rows[0].user_na;
         req.session.userProfile = result.rows[0].profile_id;
-        res.send("Sesión creada con éxito.");
+        res.send('Sesión creada con éxito.');
       } else {
-        res.status(401).send("Datos inválidos, no se puede iniciar sesión.");
+        res.status(401).send('Datos inválidos, no se puede iniciar sesión.');
       }
     } catch (error) {
-      console.error("Error creating session:", error);
-      res.status(500).send("Error interno del servidor.");
+      console.error('Error creating session:', error);
+      res.status(500).send('Error interno del servidor.');
     }
   }
 }

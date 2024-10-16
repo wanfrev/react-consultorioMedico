@@ -20,7 +20,7 @@ class Security {
         this.permission.set(key, true);
       });
     } catch (error) {
-      console.error("Error loading permissions:", error);
+      console.error('Error loading permissions:', error);
     }
   }
 
@@ -39,7 +39,7 @@ class Security {
         console.error(`Method ${jsonData.methodName} not found in ${jsonData.objectName}`);
       }
     } catch (error) {
-      console.error("Error executing method:", error);
+      console.error('Error executing method:', error);
     }
   }
 }

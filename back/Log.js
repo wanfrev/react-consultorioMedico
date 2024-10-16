@@ -1,51 +1,34 @@
-const Log = class {
+const fs = require('fs');
+
+class Log {
   constructor() {
     this.TYPE_ERROR = 0;
     this.TYPE_WARNING = 1;
     this.TYPE_INFO = 2;
     this.TYPE_DEBUG = 3;
-    this.activation = [true, false, false, false]; //se debe leer desde un archivo json (config)
+    this.activation = this.loadConfig();
+  }
+
+  loadConfig() {
+    try {
+      const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+      return config.activation || [true, false, false, false];
+    } catch (error) {
+      console.error('Error loading config:', error);
+      return [true, false, false, false];
+    }
   }
 
   show(param) {
-    switch (typeof param) {
-      case "string": {
-        console.log(param);
-        break;
+    if (typeof param === 'string') {
+      console.log(param);
+    } else if (typeof param === 'object' && param.type !== undefined) {
+      const types = ['error', 'warning', 'info', 'debug'];
+      if (this.activation[param.type]) {
+        console.log(`message: ${param.message} - type: ${types[param.type]}`);
       }
-      case "object": {
-        switch (param.type) {
-          case this.TYPE_ERROR: {
-            if (this.activation[0]) {
-              console.log("message: " + param.message + "- type: error");
-            }
-            break;
-          }
-          case this.TYPE_WARNING: {
-            if (this.activation[1]) {
-              console.log("message: " + param.message + "- type: warning");
-            }
-            break;
-          }
-          case this.TYPE_INFO: {
-            if (this.activation[2]) {
-              console.log("message: " + param.message + "- type: info");
-            }
-            break;
-          }
-          case this.TYPE_DEBUG: {
-            if (this.activation[3]) {
-              console.log("message: " + param.message + "- type: debug");
-            }
-            break;
-          }
-        }
-        break;
-      }
-
-      default:
-        break;
     }
   }
-};
+}
+
 module.exports = Log;
