@@ -1,27 +1,31 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const Db = require('./Db');
 const fs = require('fs');
+const PgHandler = require('./PgHandler');
 
 const app = express();
-const db = new Db();
+
+// Leer el archivo queries.json
+const queries = JSON.parse(fs.readFileSync(path.join(__dirname, 'json', 'queries.json'), 'utf8'));
+
+// Leer el archivo config.json
+const config = JSON.parse(fs.readFileSync(path.join(__dirname, 'json', 'config.json'), 'utf8'));
+
+// Configuración de la base de datos
+const dbConfig = config.dbConfig;
+
+// Crear instancia de PgHandler
+const db = new PgHandler({ config: dbConfig, querys: queries });
 
 app.use(express.json());
 
 app.use(session({
-  secret: 'qazwsxedcrfv10293847_thor',
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    maxAge: 1800000,
-    secure: false,
-    sameSite: true,
-  },
+  secret: config.sessionConfig.secret,
+  resave: config.sessionConfig.resave,
+  saveUninitialized: config.sessionConfig.saveUninitialized,
+  cookie: config.sessionConfig.cookie,
 }));
-
-// Leer el archivo queries.json
-const queries = JSON.parse(fs.readFileSync(path.join(__dirname, 'queries.json'), 'utf8'));
 
 // Middleware para verificar la autenticación
 const isAuthenticated = (req, res, next) => {
@@ -31,6 +35,7 @@ const isAuthenticated = (req, res, next) => {
     return res.status(401).send('Acceso denegado');
   }
 };
+
 // Ruta para la raíz
 app.get('/', (req, res) => {
   res.send('Bienvenido a la página principal');
@@ -49,10 +54,9 @@ app.post('/logout', (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const query = queries.login;
-    const result = await db.execute(query, [username, password]);
-    if (result && result.rows.length > 0) {
-      req.session.userId = result.rows[0].users_id; // Asegúrate de que el nombre de la columna sea correcto
+    const result = await db.executeQuery({ key: 'login', params: [username, password] });
+    if (result && result.length > 0) {
+      req.session.userId = result[0].users_id; // Asegúrate de que el nombre de la columna sea correcto
       return res.json({ success: true });
     } else {
       return res.status(401).json({ error: 'Error en las credenciales. Intente de nuevo' });

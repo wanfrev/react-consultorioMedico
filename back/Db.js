@@ -1,19 +1,9 @@
 const { Pool } = require('pg');
+const config = require('./config.json');
 
 class Db {
   constructor() {
-    this.pool = new Pool({
-      database: 'consultorio-medico',
-      user: 'postgres',
-      password: '30200228',
-      host: 'localhost',
-      port: 5432,
-      ssl: false,
-      max: 20,
-      idleTimeoutMillis: 1000,
-      connectionTimeoutMillis: 1000,
-      maxUses: 7500,
-    });
+    this.pool = new Pool(config.dbConfig);
   }
 
   async execute(query, params) {

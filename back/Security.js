@@ -7,15 +7,8 @@ class Security {
 
   async loadPermissions() {
     try {
-      const query = `
-        SELECT sp.permission_id, m.method_na, o.object_de, pr.profile_id
-        FROM security.permission sp
-        INNER JOIN security.method m ON m.method_id = sp.method_id
-        INNER JOIN security.object o ON o.object_id = m.object_id
-        INNER JOIN security.profile pr ON pr.profile_id = sp.profile_id
-      `;
-      const result = await this.db.execute(query, null);
-      result.rows.forEach(element => {
+      const result = await this.db.executeQuery({ key: 'loadPermissions' });
+      result.forEach(element => {
         const key = `${element.profile_id}_${element.method_na}_${element.object_de}`;
         this.permission.set(key, true);
       });
