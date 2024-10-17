@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const Db = require('./Db');
+const fs = require('fs');
 
 const app = express();
 const db = new Db();
@@ -18,6 +19,9 @@ app.use(session({
     sameSite: true,
   },
 }));
+
+// Leer el archivo queries.json
+const queries = JSON.parse(fs.readFileSync(path.join(__dirname, 'queries.json'), 'utf8'));
 
 // Middleware para verificar la autenticación
 const isAuthenticated = (req, res, next) => {
@@ -42,12 +46,13 @@ app.post('/logout', (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const result = await db.execute('SELECT * FROM "users" WHERE username = $1 AND password = $2', [username, password]);
+    const query = queries.login;
+    const result = await db.execute(query, [username, password]);
     if (result && result.rows.length > 0) {
       req.session.userId = result.rows[0].user_id; // Asegúrate de que el nombre de la columna sea correcto
       return res.json({ success: true });
     } else {
-      return res.status(401).json({ error: 'Error al iniciar sesión. Intente de nuevo' });
+      return res.status(401).json({ error: 'Error en las credenciales. Intente de nuevo' });
     }
   } catch (error) {
     console.error('Error en el login:', error);
