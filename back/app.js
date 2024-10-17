@@ -31,8 +31,11 @@ const isAuthenticated = (req, res, next) => {
     return res.status(401).send('Acceso denegado');
   }
 };
+// Ruta para la raíz
+app.get('/', (req, res) => {
+  res.send('Bienvenido a la página principal');
+});
 
-// Ruta para cerrar sesión
 app.post('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
@@ -49,7 +52,7 @@ app.post('/login', async (req, res) => {
     const query = queries.login;
     const result = await db.execute(query, [username, password]);
     if (result && result.rows.length > 0) {
-      req.session.userId = result.rows[0].user_id; // Asegúrate de que el nombre de la columna sea correcto
+      req.session.userId = result.rows[0].users_id; // Asegúrate de que el nombre de la columna sea correcto
       return res.json({ success: true });
     } else {
       return res.status(401).json({ error: 'Error en las credenciales. Intente de nuevo' });
