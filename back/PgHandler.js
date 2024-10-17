@@ -7,6 +7,7 @@ class PgHandler {
     this.pool = new Pool(config.dbConfig);
   }
 
+  async executeQuery({ key, params = [] }) {
     let client;
     try {
       const query = this.querys[key];
