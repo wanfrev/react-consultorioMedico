@@ -1,44 +1,48 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
+const cors = require('cors');
 const Db = require('./Db');
 
 const app = express();
 const db = new Db();
 
-app.use(express.json()); // Para poder parsear JSON en las peticiones
+app.use(cors());
+app.use(express.json());
 
-// Configuración de sesión
 app.use(session({
   secret: 'qwertypoiuy123_flex',
   resave: false,
   saveUninitialized: true,
   cookie: {
-    maxAge: 1800000, // 30 minutos
+    maxAge: 1800000,
     secure: false,
     sameSite: true,
   },
 }));
 
-// Servir el archivo HTML para el login
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
-});
-
-// Servir el archivo HTML para la página de inicio
-app.get('/inicio', (req, res) => {
-  res.sendFile(path.join(__dirname, 'inicio.html'));
+app.post('/logout', (req, res) => {
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).send('Error al cerrar sesión');
+    }
+    res.send({ success: true });
+  });
 });
 
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
-  const result = await db.exe('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
-
-  if (result && result.rows.length > 0) {
-    req.session.userId = result.rows[0].id;
-    res.redirect('/inicio'); // Redirigir a la página de inicio después del login
-  } else {
-    res.status(401).send('Datos inválidos, no se puede hacer login..!');
+  try {
+    const result = await db.execute('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
+    if (result && result.rows.length > 0) {
+      req.session.userId = result.rows[0].id;
+      return res.json({ success: true });
+    } else {
+      return res.status(401).json({ error: 'Error al inicia sesion. Intente de nuevo' });
+    }
+  } catch (error) {
+    console.error('Error en el login:', error);
+    res.status(500).json({ error: 'Error del servidor. Intente nuevamente más tarde.' });
   }
 });
 

@@ -1,19 +1,20 @@
-const Session = class {
-  constructor(app, db) {
-    this.session = require("express-session");
-    const PgSession = require("connect-pg-simple")(this.session);
+const expressSession = require('express-session');
+const PgSession = require('connect-pg-simple')(expressSession);
 
+class Session {
+  constructor(app, db) {
+    this.db = db;
     app.use(
-      this.session({
+      expressSession({
         store: new PgSession({
-          pool: db.pool, // Usa la pool de conexiones de tu clase Db
-          tableName: 'session' // Nombre de la tabla para almacenar las sesiones
+          pool: this.db.pool,
+          tableName: 'session',
         }),
-        secret: "qwertypoiuy123_flex",
+        secret: 'qwertypoiuy123_flex',
         resave: false,
         saveUninitialized: true,
         cookie: {
-          maxAge: 1800000, // 30 minutos
+          maxAge: 1800000,
           secure: false,
           sameSite: true,
         },
@@ -21,34 +22,32 @@ const Session = class {
     );
   }
 
-  autenticar(req) {}
-
-  sessionExist(req) {
-    if (req.session) {
-      if (req.session.userId) {
-        return true;
-      } else return false;
-    } else return false;
+  sessionExists(req) {
+    return req.session && req.session.userId ? true : false;
   }
 
-  createSession(req, res) {
-    db.exe(
-      `select u.user_id, u.user_na, p.profile_id from security.user u
-      inner join security.profile p on p.profile_id = u.profile_id 
-      where u.user_na = $1 and u.user_cl = $2
-      `,
-      [req.body.username, req.body.password]
-    ).then((r) => {
-      if (r.rows.length > 0) {
-        req.session.userId = r.rows[0].user_id;
-        req.session.userName = r.rows[0].user_na;
-        req.session.userProfile = r.rows[0].profile_id;
-        res.send("sesion creada..!");
+  async createSession(req, res) {
+    try {
+      const query = `
+        SELECT u.user_id, u.user_na, p.profile_id 
+        FROM security.user u
+        INNER JOIN security.profile p ON p.profile_id = u.profile_id 
+        WHERE u.user_na = $1 AND u.user_cl = $2
+      `;
+      const result = await this.db.execute(query, [req.body.username, req.body.password]);
+      if (result.rows.length > 0) {
+        req.session.userId = result.rows[0].user_id;
+        req.session.userName = result.rows[0].user_na;
+        req.session.userProfile = result.rows[0].profile_id;
+        res.send('Sesión creada con éxito.');
       } else {
-        res.send("Datos invalidos, no se puede hacer login..!");
+        res.status(401).send('Datos inválidos, no se puede iniciar sesión.');
       }
-    });
+    } catch (error) {
+      console.error('Error creating session:', error);
+      res.status(500).send('Error interno del servidor.');
+    }
   }
-};
+}
 
 module.exports = Session;
