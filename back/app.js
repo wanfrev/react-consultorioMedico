@@ -1,17 +1,15 @@
 const express = require('express');
 const path = require('path');
 const session = require('express-session');
-const cors = require('cors');
 const Db = require('./Db');
 
 const app = express();
 const db = new Db();
 
-app.use(cors());
 app.use(express.json());
 
 app.use(session({
-  secret: 'qwertypoiuy123_flex',
+  secret: 'qazwsxedcrfv10293847_thor',
   resave: false,
   saveUninitialized: true,
   cookie: {
@@ -21,6 +19,16 @@ app.use(session({
   },
 }));
 
+// Middleware para verificar la autenticación
+const isAuthenticated = (req, res, next) => {
+  if (req.session.userId) {
+    return next();
+  } else {
+    return res.status(401).send('Acceso denegado');
+  }
+};
+
+// Ruta para cerrar sesión
 app.post('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) {
@@ -30,15 +38,16 @@ app.post('/logout', (req, res) => {
   });
 });
 
+// Ruta para iniciar sesión
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const result = await db.execute('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
+    const result = await db.execute('SELECT * FROM "users" WHERE username = $1 AND password = $2', [username, password]);
     if (result && result.rows.length > 0) {
-      req.session.userId = result.rows[0].id;
+      req.session.userId = result.rows[0].user_id; // Asegúrate de que el nombre de la columna sea correcto
       return res.json({ success: true });
     } else {
-      return res.status(401).json({ error: 'Error al inicia sesion. Intente de nuevo' });
+      return res.status(401).json({ error: 'Error al iniciar sesión. Intente de nuevo' });
     }
   } catch (error) {
     console.error('Error en el login:', error);
@@ -46,12 +55,9 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/protected', (req, res) => {
-  if (req.session.userId) {
-    res.send('Acceso permitido');
-  } else {
-    res.send('Acceso denegado');
-  }
+// Ruta protegida
+app.get('/protected', isAuthenticated, (req, res) => {
+  res.send('Acceso permitido');
 });
 
 const PORT = process.env.PORT || 3000;

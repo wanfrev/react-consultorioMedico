@@ -30,6 +30,11 @@ class Security {
   }
 
   async executeMethod(jsonData) {
+    if (!this.hasPermission(jsonData)) {
+      console.error('Permission denied');
+      return;
+    }
+
     try {
       const ComponentClass = require(`./BO/${jsonData.objectName}.js`);
       const instance = new ComponentClass();

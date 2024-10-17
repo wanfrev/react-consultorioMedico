@@ -4,13 +4,17 @@ const PgSession = require('connect-pg-simple')(expressSession);
 class Session {
   constructor(app, db) {
     this.db = db;
+    this.setupSession(app);
+  }
+
+  setupSession(app) {
     app.use(
       expressSession({
         store: new PgSession({
           pool: this.db.pool,
           tableName: 'session',
         }),
-        secret: 'qwertypoiuy123_flex',
+        secret: 'qazwsxedcrfv10293847_thor',
         resave: false,
         saveUninitialized: true,
         cookie: {
@@ -27,17 +31,18 @@ class Session {
   }
 
   async createSession(req, res) {
+    const { username, password } = req.body;
     try {
       const query = `
-        SELECT u.user_id, u.user_na, p.profile_id 
-        FROM security.user u
+        SELECT u.users_id, u.users_na, p.profile_id 
+        FROM security.users u
         INNER JOIN security.profile p ON p.profile_id = u.profile_id 
-        WHERE u.user_na = $1 AND u.user_cl = $2
+        WHERE u.users_na = $1 AND u.users_cl = $2
       `;
-      const result = await this.db.execute(query, [req.body.username, req.body.password]);
+      const result = await this.db.execute(query, [username, password]);
       if (result.rows.length > 0) {
-        req.session.userId = result.rows[0].user_id;
-        req.session.userName = result.rows[0].user_na;
+        req.session.userId = result.rows[0].users_id;
+        req.session.userName = result.rows[0].users_na;
         req.session.userProfile = result.rows[0].profile_id;
         res.send('Sesión creada con éxito.');
       } else {
