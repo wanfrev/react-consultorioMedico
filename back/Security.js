@@ -13,7 +13,7 @@ class Security {
         this.permission.set(key, true);
       });
     } catch (error) {
-      console.error('Error loading permissions:', error);
+      console.error('Error al cargar los permisos', error);
     }
   }
 
