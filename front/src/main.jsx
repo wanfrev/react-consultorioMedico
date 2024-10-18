@@ -1,8 +1,8 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './html/Home';
-import Inicio from './html/Inicio';
+import Home from './components/Home';
+import Inicio from './components/Inicio';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
