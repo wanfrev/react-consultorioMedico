@@ -28,7 +28,7 @@ app.use(session({
 }));
 
 // Middleware para verificar la autenticación
-const isAuthenticated = (req, res, next) => {
+const checkUserAuthentication = (req, res, next) => {
   if (req.session.userId) {
     return next();
   } else {
@@ -54,9 +54,9 @@ app.post('/logout', (req, res) => {
 app.post('/login', async (req, res) => {
   const { username, password } = req.body;
   try {
-    const result = await db.executeQuery({ key: 'login', params: [username, password] });
+    const result = await db.runQueryByKey({ key: 'login', params: [username, password] });
     if (result && result.length > 0) {
-      req.session.userId = result[0].users_id; // Asegúrate de que el nombre de la columna sea correcto
+      req.session.userId = result[0].users_id;
       return res.json({ success: true });
     } else {
       return res.status(401).json({ error: 'Error en las credenciales. Intente de nuevo' });
@@ -68,7 +68,7 @@ app.post('/login', async (req, res) => {
 });
 
 // Ruta protegida
-app.get('/protected', isAuthenticated, (req, res) => {
+app.get('/protected', checkUserAuthentication, (req, res) => {
   res.send('Acceso permitido');
 });
 

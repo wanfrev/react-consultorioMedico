@@ -2,12 +2,12 @@ class Security {
   constructor(db) {
     this.db = db;
     this.permission = new Map();
-    this.loadPermissions();
+    this.initializePermissions();
   }
 
-  async loadPermissions() {
+  async initializePermissions() {
     try {
-      const result = await this.db.executeQuery({ key: 'loadPermissions' });
+      const result = await this.db.runQueryByKey({ key: 'loadPermissions' });
       result.forEach(element => {
         const key = `${element.profile_id}_${element.method_na}_${element.object_de}`;
         this.permission.set(key, true);
@@ -17,13 +17,13 @@ class Security {
     }
   }
 
-  hasPermission(jsonData) {
+  checkUserPermission(jsonData) {
     const key = `${jsonData.userProfile}_${jsonData.methodName}_${jsonData.objectName}`;
     return this.permission.get(key) || false;
   }
 
-  async executeMethod(jsonData) {
-    if (!this.hasPermission(jsonData)) {
+  async invokeMethod(jsonData) {
+    if (!this.checkUserPermission(jsonData)) {
       console.error('Permission denied');
       return;
     }

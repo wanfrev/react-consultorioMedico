@@ -1,14 +1,13 @@
 const { Pool } = require('pg');
-const config = require('../back/json/config.json'); // Cargar la configuración desde el archivo JSON
+const config = require('./json/config.json');
 
 class PgHandler {
   constructor({ querys }) {
-    this.querys = querys; // Almacenar las consultas
+    this.querys = querys;
     this.pool = new Pool(config.dbConfig); // Crear un pool de conexiones con la configuración de la base de datos
   }
 
-  // Ejecutar una consulta
-  async executeQuery({ key, params = [] }) {
+  async runQueryByKey({ key, params = [] }) {
     let client;
     try {
       const query = this.querys[key]; // Obtener la consulta por clave
@@ -16,7 +15,7 @@ class PgHandler {
       const { rows } = await client.query(query, params); // Ejecutar la consulta con los parámetros
       return rows; // Devolver las filas resultantes
     } catch (error) {
-      console.error('Database error:', error.message); // Manejar errores de la base de datos
+      console.error('Database error:', error.message);
       return { error };
     } finally {
       if (client) client.release(); // Liberar el cliente
@@ -24,28 +23,28 @@ class PgHandler {
   }
 
   // Conectar al pool de conexiones
-  async connect() {
+  async openDatabaseConnection() {
     try {
       return await this.pool.connect(); // Devolver la conexión del cliente
     } catch (error) {
-      console.error('Database connection error:', error.message); // Manejar errores de conexión
+      console.error('Database connection error:', error.message);
       return { error };
     }
   }
 
   // Liberar el pool de conexiones
-  async release() {
+  async closeConnectionPool() {
     try {
       await this.pool.end(); // Terminar todas las conexiones en el pool
     } catch (error) {
-      console.error('Error releasing pool:', error.message); // Manejar errores al liberar el pool
+      console.error('Error releasing pool:', error.message);
       return { error };
     }
   }
 
   // Ejecutar una transacción
-  async transaction({ querys = [] }) {
-    const client = await this.connect(); // Conectar al cliente
+  async executeTransaction({ querys = [] }) {
+    const client = await this.openDatabaseConnection(); // Conectar al cliente
     try {
       await client.query("BEGIN"); // Iniciar la transacción
       for (const elemento of querys) {
@@ -64,4 +63,4 @@ class PgHandler {
   }
 }
 
-module.exports = PgHandler; // Exportar la clase PgHandler
+module.exports = PgHandler;

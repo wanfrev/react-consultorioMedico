@@ -6,7 +6,7 @@ class Db {
     this.pool = new Pool(config.dbConfig);
   }
 
-  async execute(query, params) {
+  async runQuery(query, params) {
     let client;
     try {
       client = await this.pool.connect();

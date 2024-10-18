@@ -5,10 +5,10 @@ const config = require('./config.json');
 class Session {
   constructor(app, db) {
     this.db = db;
-    this.setupSession(app);
+    this.configureSession(app);
   }
 
-  setupSession(app) {
+  configureSession(app) {
     app.use(
       expressSession({
         ...config.sessionConfig,
@@ -20,14 +20,14 @@ class Session {
     );
   }
 
-  sessionExists(req) {
+  isSessionActive(req) {
     return req.session && req.session.userId ? true : false;
   }
 
-  async createSession(req, res) {
+  async initializeUserSession(req, res) {
     const { username, password } = req.body;
     try {
-      const result = await this.db.executeQuery({ key: 'login', params: [username, password] });
+      const result = await this.db.runQueryByKey({ key: 'login', params: [username, password] });
       if (result.length > 0) {
         req.session.userId = result[0].users_id;
         req.session.userName = result[0].users_na;
