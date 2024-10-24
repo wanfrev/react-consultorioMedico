@@ -1,3 +1,8 @@
 {
-    "login": "SELECT * FROM \"users\" WHERE username = $1 AND password = $2"
+    "login": "SELECT * FROM \"users\" WHERE username = $1 AND password = $2",
+    "findUserByEmail": "SELECT * FROM users WHERE email = $1",
+    "updateResetToken": "UPDATE users SET reset_password_token = $1, reset_password_expires = $2 WHERE email = $3",
+    "findUserByResetToken": "SELECT * FROM users WHERE reset_password_token = $1 AND reset_password_expires > $2",
+    "updatePassword": "UPDATE users SET password = $1, reset_password_token = NULL, reset_password_expires = NULL WHERE reset_password_token = $2"
   }
+  
