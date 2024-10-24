@@ -6,10 +6,10 @@ class Log {
     this.TYPE_WARNING = 1;
     this.TYPE_INFO = 2;
     this.TYPE_DEBUG = 3;
-    this.activation = this.loadConfig();
+    this.activation = this.initializeConfig();
   }
 
-  loadConfig() {
+  initializeConfig() {
     try {
       const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
       return config.activation || [true, false, false, false];
@@ -19,7 +19,7 @@ class Log {
     }
   }
 
-  show(param) {
+  displayLogMessage(param) {
     if (typeof param === 'string') {
       console.log(param);
     } else if (typeof param === 'object' && param.type !== undefined) {
