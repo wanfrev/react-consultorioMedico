@@ -1,44 +1,40 @@
 class Security {
   constructor(db) {
     this.db = db;
-    this.permission = new Map();
-    this.initializePermissions();
+    this.permissions = {};
   }
 
   async initializePermissions() {
     try {
-      const result = await this.db.runQueryByKey({ key: 'loadPermissions' });
-      result.forEach(element => {
-        const key = `${element.profile_id}_${element.method_na}_${element.object_de}`;
-        this.permission.set(key, true);
-      });
+      const result = await this.db.runQueryByKey({ key: 'getAllPermissions' });
+      if (Array.isArray(result)) {
+        result.forEach(row => {
+          if (!this.permissions[row.profile_id]) {
+            this.permissions[row.profile_id] = [];
+          }
+          this.permissions[row.profile_id].push({
+            method: row.method_na,
+            object: row.object_na
+          });
+        });
+      } else {
+        console.error('Error al cargar los permisos: El resultado no es un array');
+      }
     } catch (error) {
       console.error('Error al cargar los permisos', error);
     }
   }
 
-  checkUserPermission(jsonData) {
-    const key = `${jsonData.userProfile}_${jsonData.methodName}_${jsonData.objectName}`;
-    return this.permission.get(key) || false;
+  getPermission(jsonData) {
+    const { userProfile, methodName, objectName } = jsonData;
+    const userPermissions = this.permissions[userProfile] || [];
+    return userPermissions.some(permission => 
+      permission.method === methodName && permission.object === objectName
+    );
   }
 
   async invokeMethod(jsonData) {
-    if (!this.checkUserPermission(jsonData)) {
-      console.error('Permission denied');
-      return;
-    }
-
-    try {
-      const ComponentClass = require(`./BO/${jsonData.objectName}.js`);
-      const instance = new ComponentClass();
-      if (typeof instance[jsonData.methodName] === 'function') {
-        await instance[jsonData.methodName](jsonData.params);
-      } else {
-        console.error(`Method ${jsonData.methodName} not found in ${jsonData.objectName}`);
-      }
-    } catch (error) {
-      console.error('Error executing method:', error);
-    }
+    // Implementación del método para invocar el método correspondiente
   }
 }
 

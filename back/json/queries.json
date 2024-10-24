@@ -1,3 +1,9 @@
 {
-    "login": "SELECT * FROM \"users\" WHERE username = $1 AND password = $2"
-  }
+  "login": "SELECT u.user_id, up.profile_id FROM \"users\" u INNER JOIN user_profile up ON u.user_id = up.user_id WHERE u.username = $1 AND u.password = $2",
+  "getUserProfile": "SELECT profile_id FROM user_profile WHERE user_id = $1",
+  "registerUser": "INSERT INTO users (username, password, person_id) VALUES ($1, $2, $3) RETURNING *",
+  "checkUserExists": "SELECT 1 FROM users WHERE username = $1",
+  "registerData": "INSERT INTO person (person_na, person_lna, person_pho, person_eml, person_dir) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+  "getAllPermissions": "SELECT p.profile_id, m.method_na, o.object_na FROM public.permission_method pm JOIN public.profile p ON pm.profile_id = p.profile_id JOIN method m ON pm.method_id = m.method_id JOIN object o ON m.object_id = o.object_id",
+  "agendarCita": "INSERT INTO appointment (appointment_dt, appointment_hr, person_id, employer_id, department_id) VALUES ($1, $2, $3, $4, 4) RETURNING *"
+}

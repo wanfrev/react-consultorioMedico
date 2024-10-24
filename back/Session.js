@@ -1,6 +1,11 @@
 const expressSession = require('express-session');
 const PgSession = require('connect-pg-simple')(expressSession);
-const config = require('./config.json');
+const path = require('path');
+const fs = require('fs');
+
+// Leer el archivo config.json
+const configPath = path.join(__dirname, 'json', 'config.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 class Session {
   constructor(app, db) {
