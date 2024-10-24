@@ -22,7 +22,7 @@ export const SidebarComponent = () => {
       });
 
       if (response.ok) {
-        navigate('/login'); // Redirigir al login
+        navigate('/'); // Redirigir al login
       } else {
         console.error('Error al cerrar sesión');
       }
