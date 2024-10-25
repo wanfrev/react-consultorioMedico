@@ -1,7 +1,7 @@
-import { Navigate, Route, Routes } from "react-router-dom"
+import { Route, Routes } from "react-router-dom"
 
-import Home from "../pages/Home"
 import Login from "../pages/Login"
+import { AppRoutes } from "../routes/AppRoutes"
 
 
 export const AppRouter = () => {
@@ -9,10 +9,8 @@ export const AppRouter = () => {
     <>
       <Routes>
         <Route path="/" element={<Login />} />
-
-        <Route path="/Home" element={<Home />} />
-        <Route path="/" element={<Navigate to="/home" />} />
-        <Route path="/*" element={<Navigate to="/" />} />
+        {/* Aqui va registro y olvido contrasenia */}
+        <Route path="/*" element={<AppRoutes />} />
       </Routes>
     </>
   )

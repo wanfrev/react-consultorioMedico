@@ -1,60 +1,85 @@
-import { Navbar, Nav, Button, Offcanvas } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState } from 'react';
-import './SidebarComponent.css';
-import { Link, useNavigate } from 'react-router-dom';
-
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./SidebarComponent.css";
+import { useNavigate, Link } from "react-router-dom";
 
 export const SidebarComponent = () => {
-  const [show, setShow] = useState(false);
   const navigate = useNavigate();
-
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('/api/logout', {
-        method: 'POST',
+      const response = await fetch("/api/logout", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (response.ok) {
-        navigate('/'); // Redirigir al login
+        navigate("/"); // Redirigir al login
       } else {
-        console.error('Error al cerrar sesión');
+        console.error("Error al cerrar sesión");
       }
     } catch (error) {
-      console.error('Error al conectar con el servidor');
+      console.error("Error al conectar con el servidor");
     }
   };
 
   return (
-    <div className="App d-flex">
-      <div className="content flex-grow-1">
-        <Navbar bg="dark" variant="dark" expand="lg">
-          <Button variant="outline-light" onClick={handleShow}>
-            ☰
-          </Button>
-          <Navbar.Brand href="#home" className="ms-3">Mi Aplicación</Navbar.Brand>
-        </Navbar>
-
-        <Offcanvas show={show} onHide={handleClose} className="bg-dark text-white" placement="start">
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Menú</Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
-            <Nav className="flex-column">
-              <Link href="#home" className="text-white">Inicio</Link>
-              <Link href="#profile" className="text-white">Perfil</Link>
-              <Link href="#settings" className="text-white">Configuración</Link>
-              <Link href="#logout" className="text-white" onClick={handleLogout}>Cerrar Sesión</Link>
-            </Nav>
-          </Offcanvas.Body>
-        </Offcanvas>
+    <nav className="navbar navbar-dark bg-dark fixed-top">
+      <div className="container-fluid">
+        <a className="navbar-brand" href="#">
+          Medi+Linktech
+        </a>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasDarkNavbar"
+          aria-controls="offcanvasDarkNavbar"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div
+          className="offcanvas offcanvas-end text-bg-dark"
+          id="offcanvasDarkNavbar"
+          aria-labelledby="offcanvasDarkNavbarLabel"
+        >
+          <div className="offcanvas-header">
+            <h5 className="offcanvas-title" id="offcanvasDarkNavbarLabel">
+              Medi+Linktech
+            </h5>
+            <button
+              type="button"
+              className="btn-close btn-close-white"
+              data-bs-dismiss="offcanvas"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div className="offcanvas-body">
+            <ul className="navbar-nav justify-content-end flex-grow-1 pe-3">
+              <li className="nav-item">
+                <Link className="nav-link active" aria-current="page" to="/home">Home
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" href="#">
+                  Crear una cita
+                </Link>
+              </li>
+            </ul>
+            <form className="d-flex mt-3" role="search">
+              <button
+                className="btn btn-danger"
+                type="submit"
+                onClick={handleLogout}
+              >
+                Log Out
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
-    </div>
+    </nav>
   );
 };
