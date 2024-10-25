@@ -1,11 +1,10 @@
-import { SidebarComponent } from '../components/SidebarComponent';
 
 const Home = () => {
   
 
   return (
     <>
-      <SidebarComponent/>
+      <p>Hola</p>
     </>
   );
 };
