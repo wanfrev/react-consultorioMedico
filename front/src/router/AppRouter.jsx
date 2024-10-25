@@ -8,9 +8,9 @@ export const AppRouter = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Login />} /> /* Ruta de inicio donde empezara la pagina */
+        <Route path="/" element={<Login />} />
 
-        <Route path="/Home" element={<Home />} /> /* Ruta de la pagina principal, despues de hacer login */
+        <Route path="/Home" element={<Home />} />
         <Route path="/" element={<Navigate to="/home" />} />
         <Route path="/*" element={<Navigate to="/" />} />
       </Routes>

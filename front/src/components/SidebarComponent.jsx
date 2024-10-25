@@ -2,7 +2,7 @@ import { Navbar, Nav, Button, Offcanvas } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import './SidebarComponent.css';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 export const SidebarComponent = () => {
@@ -47,10 +47,10 @@ export const SidebarComponent = () => {
           </Offcanvas.Header>
           <Offcanvas.Body>
             <Nav className="flex-column">
-              <Nav.Link href="#home" className="text-white">Inicio</Nav.Link>
-              <Nav.Link href="#profile" className="text-white">Perfil</Nav.Link>
-              <Nav.Link href="#settings" className="text-white">Configuración</Nav.Link>
-              <Nav.Link href="#logout" className="text-white" onClick={handleLogout}>Cerrar Sesión</Nav.Link>
+              <Link href="#home" className="text-white">Inicio</Link>
+              <Link href="#profile" className="text-white">Perfil</Link>
+              <Link href="#settings" className="text-white">Configuración</Link>
+              <Link href="#logout" className="text-white" onClick={handleLogout}>Cerrar Sesión</Link>
             </Nav>
           </Offcanvas.Body>
         </Offcanvas>
